@@ -30,7 +30,7 @@ function createMainWindow() {
     height: 720,
     minWidth: 960,
     minHeight: 640,
-    backgroundColor: '#16161E',
+    backgroundColor: '#FDFBF7',
     show: false,
     autoHideMenuBar: true,
     title: 'DeepSeek Monitor',
@@ -180,7 +180,7 @@ ipcMain.handle('auth:loginDeepSeek', async () => {
       height: 720,
       title: '登录 DeepSeek',
       autoHideMenuBar: true,
-      backgroundColor: '#16161E',
+      backgroundColor: '#FDFBF7',
       webPreferences: {
         partition: 'persist:deepseek',
         contextIsolation: true,

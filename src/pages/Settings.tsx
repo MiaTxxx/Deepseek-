@@ -114,19 +114,19 @@ export default function Settings() {
   return (
     <div className="p-6 max-w-[900px] mx-auto space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-dark-text">设置</h1>
-        <p className="text-xs text-dark-muted mt-1">配置你的 API Key 与平台登录以启用所有数据</p>
+        <h1 className="text-xl font-semibold text-warm-800">设置</h1>
+        <p className="text-xs text-warm-600 mt-1">配置你的 API Key 与平台登录以启用所有数据</p>
       </div>
 
       {/* API Key */}
       <section className="card p-6 space-y-4">
         <header className="flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-dark-text">API Key</h2>
-            <p className="text-xs text-dark-muted mt-1">用于查询余额。存储在本地（加密）</p>
+            <h2 className="text-sm font-semibold text-warm-800">API Key</h2>
+            <p className="text-xs text-warm-600 mt-1">用于查询余额。存储在本地（加密）</p>
           </div>
           <button
-            className="text-xs text-neon-blue no-drag hover:underline"
+            className="text-xs text-accent-terracotta no-drag hover:underline"
             onClick={() => window.dsApi.openExternal('https://platform.deepseek.com/api_keys')}
           >
             获取 API Key →
@@ -160,8 +160,8 @@ export default function Settings() {
       <section className="card p-6 space-y-4">
         <header className="flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-dark-text">DeepSeek 平台登录</h2>
-            <p className="text-xs text-dark-muted mt-1">
+            <h2 className="text-sm font-semibold text-warm-800">DeepSeek 平台登录</h2>
+            <p className="text-xs text-warm-600 mt-1">
               登录后可读取使用量统计（token、请求次数、模型分布、消耗金额等）
             </p>
           </div>
@@ -186,9 +186,9 @@ export default function Settings() {
       <section className="card p-6 space-y-4">
         <header className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-sm font-semibold text-dark-text">用量接口诊断</h2>
-            <p className="text-xs text-dark-muted mt-1 leading-relaxed">
-              DeepSeek 平台没有公开用量 API。点「诊断」后会弹出一个浏览器窗口，<b className="text-neon-cyan">你手动点进「用量统计」或「Usage」页面</b>，让页面加载出来，然后关闭那个窗口。程序会列出所有抓到的接口，你选对应的那个即可。
+            <h2 className="text-sm font-semibold text-warm-800">用量接口诊断</h2>
+            <p className="text-xs text-warm-600 mt-1 leading-relaxed">
+              DeepSeek 平台没有公开用量 API。点「诊断」后会弹出一个浏览器窗口，<b>你手动点进「用量统计」或「Usage」页面</b>，让页面加载出来，然后关闭那个窗口。程序会列出所有抓到的接口，你选对应的那个即可。
             </p>
           </div>
           <span className={`badge ${usageEndpoint ? 'badge-ok' : 'badge-warn'} shrink-0`}>
@@ -197,7 +197,7 @@ export default function Settings() {
         </header>
 
         {usageEndpoint && (
-          <div className="text-[11px] font-mono text-neon-blue bg-dark-bg/60 rounded-md p-2 break-all">
+          <div className="text-[11px] font-mono text-warm-700 bg-cream-100/70 rounded-md p-2 break-all">
             {usageEndpoint}
           </div>
         )}
@@ -218,32 +218,32 @@ export default function Settings() {
         </div>
 
         {diagAuto && (
-          <div className="text-xs bg-neon-green/10 border border-neon-green/30 rounded-md p-3">
-            <div className="font-medium text-neon-green mb-1">
+          <div className="text-xs bg-accent-sage/10 border border-accent-sage/30 rounded-md p-3">
+            <div className="font-medium text-[#5a6b4f] mb-1">
               自动识别到疑似用量接口（{diagAuto.rows} 行数据）
             </div>
-            <div className="font-mono text-[11px] break-all text-dark-muted">{diagAuto.url}</div>
+            <div className="font-mono text-[11px] break-all text-warm-700">{diagAuto.url}</div>
           </div>
         )}
 
         {sortedDiag && sortedDiag.length > 0 && (
           <div className="space-y-2">
-            <p className="text-xs text-dark-muted">
+            <p className="text-xs text-warm-600">
               共抓到 {sortedDiag.length} 个 JSON 响应，按疑似用量匹配度排序。点击条目可展开预览，点「选为用量接口」绑定。
             </p>
-            <div className="border border-dark-border rounded-lg divide-y divide-dark-border max-h-[460px] overflow-auto">
+            <div className="border border-cream-200 rounded-lg divide-y divide-cream-200 max-h-[460px] overflow-auto">
               {sortedDiag.map((item) => (
-                <div key={item.index} className="p-3 hover:bg-dark-bg/60 transition-colors">
+                <div key={item.index} className="p-3 hover:bg-cream-50/60 transition-colors">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 text-[11px] text-dark-muted mb-1">
-                        <span className="font-medium text-dark-text">{item.method}</span>
+                      <div className="flex items-center gap-2 text-[11px] text-warm-600 mb-1">
+                        <span className="font-medium text-warm-700">{item.method}</span>
                         <span>{(item.bytes / 1024).toFixed(1)} KB</span>
                         {item.usageRowMatches > 0 && (
                           <span className="badge badge-ok !py-0">匹配 {item.usageRowMatches} 行</span>
                         )}
                       </div>
-                      <div className="font-mono text-[11px] text-neon-blue break-all">
+                      <div className="font-mono text-[11px] text-warm-800 break-all">
                         {item.url}
                       </div>
                     </div>
@@ -265,7 +265,7 @@ export default function Settings() {
                     </div>
                   </div>
                   {expandedIdx === item.index && (
-                    <pre className="mt-2 text-[10px] bg-dark-bg/80 rounded p-2 overflow-auto max-h-48 whitespace-pre-wrap break-all text-dark-muted">
+                    <pre className="mt-2 text-[10px] bg-cream-100/70 rounded p-2 overflow-auto max-h-48 whitespace-pre-wrap break-all text-warm-700">
                       {item.preview}
                     </pre>
                   )}
@@ -279,8 +279,8 @@ export default function Settings() {
       {/* Refresh */}
       <section className="card p-6 space-y-4">
         <header>
-          <h2 className="text-sm font-semibold text-dark-text">刷新间隔</h2>
-          <p className="text-xs text-dark-muted mt-1">主面板与悬浮窗的数据自动刷新周期</p>
+          <h2 className="text-sm font-semibold text-warm-800">刷新间隔</h2>
+          <p className="text-xs text-warm-600 mt-1">主面板与悬浮窗的数据自动刷新周期</p>
         </header>
         <div className="flex items-center gap-3">
           <input
@@ -291,7 +291,7 @@ export default function Settings() {
             value={refreshIntervalSec}
             onChange={(e) => setRefreshIntervalSec(Number(e.target.value))}
           />
-          <span className="text-xs text-dark-muted">秒</span>
+          <span className="text-xs text-warm-600">秒</span>
           <button className="btn btn-primary ml-auto" onClick={save}>
             保存
           </button>
@@ -299,12 +299,12 @@ export default function Settings() {
       </section>
 
       {msg && (
-        <div className={`text-xs ${msg.type === 'ok' ? 'text-neon-green' : 'text-neon-red'}`}>
+        <div className={`text-xs ${msg.type === 'ok' ? 'text-[#5a6b4f]' : 'text-[#9a3a3a]'}`}>
           {msg.text}
         </div>
       )}
 
-      <p className="text-[11px] text-dark-muted/70 leading-relaxed pt-2">
+      <p className="text-[11px] text-warm-600/70 leading-relaxed pt-2">
         提示：DeepSeek 官方仅公开余额 API，使用量数据需通过浏览平台页面捕获其内部接口。接口地址会根据平台改版变化。若数据不再更新，重新登录并运行「诊断接口」即可。
       </p>
     </div>

@@ -4,29 +4,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        dark: {
-          bg: '#16161E',
-          panel: '#1E1E2E',
-          border: '#2A2A3E',
-          text: '#C0CAF5',
-          muted: '#565F89'
+        cream: {
+          50: '#FDFBF7',
+          100: '#FAF6EF',
+          200: '#F5EEE0',
+          300: '#EBDFC7',
+          400: '#D9C5A0',
+          500: '#C4A878'
         },
-        neon: {
-          blue: '#3D59AB',
-          purple: '#9D7CD8',
-          yellow: '#E0AF68',
-          cyan: '#7DCFFF',
-          green: '#9ECE6A',
-          orange: '#FF9E64',
-          red: '#F7768E'
+        warm: {
+          50: '#FBF8F3',
+          100: '#F6F1E8',
+          200: '#ECE3D1',
+          300: '#DCCDB0',
+          600: '#8B7355',
+          700: '#6B5842',
+          800: '#4A3E2E',
+          900: '#2E2620'
+        },
+        accent: {
+          peach: '#F4B183',
+          terracotta: '#D78B5C',
+          sage: '#A8B89D',
+          dusty: '#C4A78F'
         }
       },
       fontFamily: {
         sans: ['Inter', '"PingFang SC"', '"Microsoft YaHei"', 'sans-serif']
       },
       boxShadow: {
-        neon: '0 0 15px -3px rgba(61, 89, 171, 0.4)',
-        glass: '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+        soft: '0 4px 20px -4px rgba(139, 115, 85, 0.12)',
+        warm: '0 8px 30px -8px rgba(215, 139, 92, 0.25)'
       }
     }
   },

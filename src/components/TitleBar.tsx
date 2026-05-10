@@ -13,10 +13,10 @@ export default function TitleBar({ active, onNavigate }: Props) {
   }, []);
 
   return (
-    <header className="titlebar h-12 flex items-center justify-between px-4 border-b border-dark-border bg-dark-bg/80 backdrop-blur">
+    <header className="titlebar h-12 flex items-center justify-between px-4 border-b border-cream-200 bg-cream-50/80 backdrop-blur">
       <div className="flex items-center gap-2">
-        <img src="./logo.svg" alt="logo" className="w-6 h-6 rounded-lg shadow-neon" />
-        <span className="text-sm font-semibold text-dark-text">DeepSeek Monitor</span>
+        <img src="./logo.svg" alt="logo" className="w-6 h-6 rounded-lg shadow-warm" />
+        <span className="text-sm font-semibold text-warm-700">DeepSeek Monitor</span>
       </div>
 
       <nav className="no-drag flex items-center gap-1">
@@ -36,14 +36,14 @@ export default function TitleBar({ active, onNavigate }: Props) {
           <span className="text-xs">🪟 {floatOn ? '收起悬浮' : '悬浮窗'}</span>
         </button>
         <button
-          className="w-8 h-8 rounded-lg hover:bg-dark-border flex items-center justify-center text-dark-muted"
+          className="w-8 h-8 rounded-lg hover:bg-cream-200 flex items-center justify-center text-warm-600"
           onClick={() => window.dsApi.winMinimize()}
           title="最小化"
         >
           —
         </button>
         <button
-          className="w-8 h-8 rounded-lg hover:bg-dark-border flex items-center justify-center text-dark-muted"
+          className="w-8 h-8 rounded-lg hover:bg-cream-200 flex items-center justify-center text-warm-600"
           onClick={() => window.dsApi.winHide()}
           title="隐藏到托盘"
         >
@@ -68,8 +68,8 @@ function TabBtn({
       onClick={onClick}
       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
         active
-          ? 'bg-gradient-to-r from-neon-blue/20 to-neon-purple/20 text-neon-cyan'
-          : 'text-dark-muted hover:bg-dark-border'
+          ? 'bg-gradient-to-r from-accent-peach/20 to-accent-terracotta/20 text-accent-terracotta'
+          : 'text-warm-600 hover:bg-cream-200'
       }`}
     >
       {label}
