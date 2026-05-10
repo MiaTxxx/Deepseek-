@@ -2,7 +2,11 @@
   <img src="public/logo.svg" width="120" alt="DeepSeek Monitor" />
 </p>
 
-<h1 align="center">DeepSeek Monitor (深寻监视器)</h1>
+<h1 align="center">DeepSeek Monitor</h1>
+
+<p align="center">
+  <a href="README.en.md">English</a> | <b>中文</b>
+</p>
 
 <p align="center">
   <b>暖白风的 DeepSeek 账户额度 & 用量监测桌面应用，带常驻悬浮窗。</b><br/>
