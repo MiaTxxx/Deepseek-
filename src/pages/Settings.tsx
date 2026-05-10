@@ -37,32 +37,45 @@ export default function Settings() {
   }, []);
 
   const save = async () => {
-    await window.dsApi.setConfig({ apiKey, refreshIntervalSec });
-    setMsg({ type: 'ok', text: '已保存' });
+    const r = await window.dsApi.setConfig({ apiKey, refreshIntervalSec });
+    if (r.ok) {
+      setMsg({ type: 'ok', text: '已保存' });
+    } else {
+      setMsg({ type: 'err', text: '保存失败' });
+    }
     setTimeout(() => setMsg(null), 1600);
   };
 
   const testBalance = async () => {
-    await window.dsApi.setConfig({ apiKey });
-    const r = await window.dsApi.fetchBalance();
-    if (r.ok) {
-      const b = r.data?.balance_infos?.[0];
-      setMsg({ type: 'ok', text: `连接成功 · 余额 ${b?.total_balance} ${b?.currency}` });
-    } else {
-      setMsg({ type: 'err', text: r.error ?? '失败' });
+    try {
+      await window.dsApi.setConfig({ apiKey });
+      const r = await window.dsApi.fetchBalance();
+      if (r.ok) {
+        const b = r.data?.balance_infos?.[0];
+        setMsg({ type: 'ok', text: `连接成功 · 余额 ${b?.total_balance} ${b?.currency}` });
+      } else {
+        setMsg({ type: 'err', text: r.error ?? '失败' });
+      }
+    } catch (err: any) {
+      setMsg({ type: 'err', text: err?.message ?? '余额查询异常' });
     }
   };
 
   const login = async () => {
     setLoggingIn(true);
     setMsg(null);
-    const r = await window.dsApi.loginDeepSeek();
-    setLoggingIn(false);
-    if (r.ok) {
-      setHasCookie(true);
-      setMsg({ type: 'ok', text: '登录成功' });
-    } else {
-      setMsg({ type: 'err', text: r.error ?? '登录失败' });
+    try {
+      const r = await window.dsApi.loginDeepSeek();
+      if (r.ok) {
+        setHasCookie(true);
+        setMsg({ type: 'ok', text: '登录成功' });
+      } else {
+        setMsg({ type: 'err', text: r.error ?? '登录失败' });
+      }
+    } catch (err: any) {
+      setMsg({ type: 'err', text: err?.message ?? '登录异常' });
+    } finally {
+      setLoggingIn(false);
     }
   };
 
@@ -77,16 +90,21 @@ export default function Settings() {
     setMsg(null);
     setDiagItems(null);
     setDiagAuto(null);
-    const r = await window.dsApi.diagnose();
-    setDiagRunning(false);
-    if (!r.ok) {
-      setMsg({ type: 'err', text: r.error ?? '诊断失败' });
-      return;
-    }
-    setDiagItems(r.items ?? []);
-    setDiagAuto(r.autoBest ?? null);
-    if ((r.total ?? 0) === 0) {
-      setMsg({ type: 'err', text: '一个 XHR 都没抓到，可能是 Cookie 失效，请重新登录' });
+    try {
+      const r = await window.dsApi.diagnose();
+      if (!r.ok) {
+        setMsg({ type: 'err', text: r.error ?? '诊断失败' });
+        return;
+      }
+      setDiagItems(r.items ?? []);
+      setDiagAuto(r.autoBest ?? null);
+      if ((r.total ?? 0) === 0) {
+        setMsg({ type: 'err', text: '一个 XHR 都没抓到，可能是 Cookie 失效，请重新登录' });
+      }
+    } catch (err: any) {
+      setMsg({ type: 'err', text: err?.message ?? '诊断异常' });
+    } finally {
+      setDiagRunning(false);
     }
   };
 
@@ -289,7 +307,13 @@ export default function Settings() {
             min={15}
             max={3600}
             value={refreshIntervalSec}
-            onChange={(e) => setRefreshIntervalSec(Number(e.target.value))}
+            onChange={(e) => {
+              const raw = e.target.value;
+              if (raw === '') { setRefreshIntervalSec(60); return; }
+              const n = Number(raw);
+              if (isNaN(n)) return;
+              setRefreshIntervalSec(Math.min(3600, Math.max(15, n)));
+            }}
           />
           <span className="text-xs text-warm-600">秒</span>
           <button className="btn btn-primary ml-auto" onClick={save}>

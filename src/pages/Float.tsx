@@ -47,10 +47,18 @@ export default function Float() {
   const [data, setData] = useState<FetchAllResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [intervalSec, setIntervalSec] = useState(60);
 
   useEffect(() => {
     document.body.classList.add('float-body');
     return () => document.body.classList.remove('float-body');
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const cfg = await window.dsApi.getConfig();
+      setIntervalSec(cfg.refreshIntervalSec ?? 60);
+    })();
   }, []);
 
   const load = useCallback(async () => {
@@ -65,10 +73,11 @@ export default function Float() {
   }, []);
 
   useEffect(() => {
+    if (!intervalSec) return;
     load();
-    const t = window.setInterval(load, 60_000);
+    const t = window.setInterval(load, intervalSec * 1000);
     return () => window.clearInterval(t);
-  }, [load]);
+  }, [intervalSec, load]);
 
   const balance = data?.balance?.balance_infos?.[0];
   const usage = data?.usage;
@@ -96,8 +105,8 @@ export default function Float() {
   return (
     <div className="w-screen h-screen p-2">
       <div className="float-card w-full h-full relative overflow-hidden flex flex-col">
-        {/* drag handle */}
-        <div className="absolute inset-0" style={{ WebkitAppRegion: 'drag' } as any} />
+        {/* drag handle — restricted to header area */}
+        <div className="absolute top-0 left-0 right-0 h-10" style={{ WebkitAppRegion: 'drag' } as any} />
 
         <div className="relative p-3 flex flex-col h-full gap-2.5">
           {/* Header */}
@@ -244,9 +253,11 @@ export default function Float() {
           )}
 
           {/* Error state */}
-          {!usage && data?.errors && data.errors.length > 0 && (
+          {data?.errors && data.errors.length > 0 && (
             <div className="mt-auto text-[9px] text-warm-600/80 bg-cream-100/60 rounded px-2 py-1.5">
-              {data.errors.find((e) => e.kind === 'usage')?.error ?? '数据未就绪'}
+              {data.errors.map((e, i) => (
+                <div key={i}>{e.error}</div>
+              ))}
             </div>
           )}
         </div>

@@ -97,9 +97,13 @@ function createFloatWindow() {
   loadRoute(floatWindow, '/float');
 
   floatWindow.on('moved', () => {
-    if (!floatWindow) return;
-    const [x, y] = floatWindow.getPosition();
-    store.set('floatBounds', { x, y });
+    try {
+      if (!floatWindow) return;
+      const [x, y] = floatWindow.getPosition();
+      store.set('floatBounds', { x, y });
+    } catch {
+      // window destroyed during event
+    }
   });
 
   floatWindow.on('closed', () => {
@@ -169,11 +173,25 @@ ipcMain.handle('main:show', () => {
   }
 });
 
-ipcMain.handle('open:external', (_e, url: string) => shell.openExternal(url));
+ipcMain.handle('open:external', async (_e, url: string) => {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+      await shell.openExternal(url);
+    }
+  } catch {
+    // invalid URL, silently reject
+  }
+});
 
 // Login window: lets the user sign in to platform.deepseek.com,
 // then we harvest cookies for authenticated API requests.
 ipcMain.handle('auth:loginDeepSeek', async () => {
+  // Close any existing login window to prevent leaks on concurrent calls
+  if (loginWindow && !loginWindow.isDestroyed()) {
+    loginWindow.close();
+    loginWindow = null;
+  }
   return new Promise<{ ok: boolean; cookie?: string; error?: string }>((resolve) => {
     loginWindow = new BrowserWindow({
       width: 480,
@@ -226,6 +244,9 @@ app.whenReady().then(() => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
   });
+}).catch((err) => {
+  console.error('app.whenReady failed:', err);
+  app.quit();
 });
 
 app.on('window-all-closed', () => {

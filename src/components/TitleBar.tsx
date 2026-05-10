@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface Props {
   active: string;
@@ -7,10 +7,6 @@ interface Props {
 
 export default function TitleBar({ active, onNavigate }: Props) {
   const [floatOn, setFloatOn] = useState(false);
-
-  useEffect(() => {
-    // nothing to do on init; state is local toggle-intent
-  }, []);
 
   return (
     <header className="titlebar h-12 flex items-center justify-between px-4 border-b border-cream-200 bg-cream-50/80 backdrop-blur">
@@ -28,7 +24,9 @@ export default function TitleBar({ active, onNavigate }: Props) {
         <button
           className="btn btn-ghost !py-1.5 !px-3"
           onClick={async () => {
-            await window.dsApi.toggleFloat();
+            try {
+              await window.dsApi.toggleFloat();
+            } catch { /* ignore */ }
             setFloatOn((v) => !v);
           }}
           title="显示/隐藏悬浮窗"

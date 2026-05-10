@@ -3,6 +3,7 @@ import Dashboard from './pages/Dashboard';
 import Float from './pages/Float';
 import Settings from './pages/Settings';
 import TitleBar from './components/TitleBar';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function getRoute(): string {
   const hash = window.location.hash.replace('#', '');
@@ -19,7 +20,7 @@ export default function App() {
   }, []);
 
   if (route === '/float') {
-    return <Float />;
+    return <ErrorBoundary><Float /></ErrorBoundary>;
   }
 
   return (
@@ -31,7 +32,11 @@ export default function App() {
         }}
       />
       <main className="flex-1 overflow-auto">
-        {route === '/settings' ? <Settings /> : <Dashboard />}
+        <ErrorBoundary>
+          {route === '/settings' ? <Settings /> : route === '/' || route === '' ? <Dashboard /> : (
+            <div className="p-6 text-center text-xs text-warm-600">页面不存在</div>
+          )}
+        </ErrorBoundary>
       </main>
     </div>
   );

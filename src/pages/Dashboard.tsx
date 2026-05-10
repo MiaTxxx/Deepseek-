@@ -147,7 +147,7 @@ export default function Dashboard() {
             </span>
           </div>
           <div className="h-64">
-            {usage && usage.series.length === 0 ? (
+            {usage?.series?.length === 0 ? (
               <EmptyState
                 text={`平台返回的是月度累计数据，暂无日粒度曲线。本月累计 ${(
                   usage.totals.totalTokens / 1000

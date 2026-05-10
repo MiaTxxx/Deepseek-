@@ -4,6 +4,8 @@ import { scrapePlatformUsage, fetchJsonWithCookie, CapturedResponse } from './sc
 
 type JsonObj = Record<string, any>;
 
+let lastCaptured: CapturedResponse[] = [];
+
 function httpRequest(opts: {
   url: string;
   method?: 'GET' | 'POST';
@@ -574,7 +576,7 @@ export function registerApiHandlers() {
     });
     const summary = summarizeCaptured(captured);
     const autoBest = autoBestFromCaptured(captured);
-    (global as any).__lastCaptured = captured;
+    lastCaptured = captured;
 
     // Auto-bind the best candidate so the user doesn't need an extra click.
     let autoBound = false;
@@ -600,7 +602,7 @@ export function registerApiHandlers() {
   });
 
   ipcMain.handle('api:useCaptured', async (_e, index: number) => {
-    const captured: CapturedResponse[] = (global as any).__lastCaptured ?? [];
+    const captured: CapturedResponse[] = lastCaptured;
     const item = captured[index];
     if (!item) return { ok: false, error: '条目不存在' };
 

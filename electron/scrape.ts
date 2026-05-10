@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, net, session } from 'electron';
 
 export interface CapturedResponse {
   url: string;
@@ -52,6 +52,7 @@ export async function scrapePlatformUsage(opts: {
     const finish = (error?: string) => {
       if (settled) return;
       settled = true;
+      requests.clear();
       let finalUrl = '';
       try {
         finalUrl = win.webContents.getURL();
@@ -85,6 +86,11 @@ export async function scrapePlatformUsage(opts: {
             method: params.request.method,
             headers: params.request.headers ?? {},
           });
+          return;
+        }
+
+        if (method === 'Network.loadingFailed') {
+          requests.delete(params.requestId);
           return;
         }
 
@@ -158,7 +164,6 @@ export async function fetchJsonWithCookie(
   cookie: string,
   extraHeaders?: Record<string, string>,
 ) {
-  const { net, session } = await import('electron');
   return new Promise<{ status: number; json: any; text: string }>((resolve, reject) => {
     const req = net.request({
       url,
