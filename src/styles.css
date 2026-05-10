@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #fdfbf7;
+  color: #4a3e2e;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* Custom scrollbar - warm tones */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #e5d5b8;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d9c5a0;
+}
+
+.titlebar {
+  -webkit-app-region: drag;
+}
+.titlebar button,
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+.glass {
+  background: rgba(253, 251, 247, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Warm gradient for cards */
+.card {
+  background: linear-gradient(180deg, #ffffff 0%, #fbf8f3 100%);
+  border: 1px solid rgba(220, 205, 176, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px -8px rgba(139, 115, 85, 0.12);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 160ms ease;
+  user-select: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #f4b183 0%, #d78b5c 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px -4px rgba(215, 139, 92, 0.45);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px -4px rgba(215, 139, 92, 0.55);
+}
+
+.btn-ghost {
+  background: rgba(236, 227, 209, 0.5);
+  color: #6b5842;
+}
+.btn-ghost:hover {
+  background: rgba(236, 227, 209, 0.85);
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fbf8f3;
+  border: 1px solid rgba(220, 205, 176, 0.55);
+  color: #4a3e2e;
+  outline: none;
+  transition: all 160ms ease;
+  font-size: 13px;
+}
+.input:focus {
+  border-color: #d78b5c;
+  box-shadow: 0 0 0 3px rgba(215, 139, 92, 0.15);
+  background: #fff;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.badge-ok {
+  background: rgba(168, 184, 157, 0.25);
+  color: #5a6b4f;
+}
+.badge-warn {
+  background: rgba(244, 177, 131, 0.25);
+  color: #8a5a33;
+}
+.badge-err {
+  background: rgba(215, 100, 100, 0.2);
+  color: #9a3a3a;
+}
+
+/* Float window specific */
+.float-body {
+  background: transparent !important;
+}
+.float-card {
+  background: linear-gradient(160deg, rgba(253, 251, 247, 0.97) 0%, rgba(246, 241, 232, 0.97) 100%);
+  border-radius: 18px;
+  border: 1px solid rgba(215, 139, 92, 0.2);
+  box-shadow: 0 12px 40px -12px rgba(74, 62, 46, 0.3);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
