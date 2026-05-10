@@ -12,6 +12,10 @@ let floatWindow: BrowserWindow | null = null;
 let loginWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 
+const getIconPath = () => app.isPackaged
+  ? path.join(__dirname, '..', 'dist', 'icon.png')
+  : path.join(__dirname, '..', 'public', 'icon.png');
+
 function loadRoute(win: BrowserWindow, route: string) {
   if (isDev) {
     win.loadURL(`${DEV_URL}#${route}`);
@@ -30,7 +34,7 @@ function createMainWindow() {
     show: false,
     autoHideMenuBar: true,
     title: 'DeepSeek Monitor',
-    icon: path.join(__dirname, '..', 'build', 'icon.png'),
+    icon: getIconPath(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -105,8 +109,7 @@ function createFloatWindow() {
 
 function createTray() {
   // Use actual icon for tray
-  const iconPath = path.join(__dirname, '..', 'build', 'icon.png');
-  const icon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
+  const icon = nativeImage.createFromPath(getIconPath()).resize({ width: 16, height: 16 });
   tray = new Tray(icon);
   tray.setToolTip('DeepSeek Monitor');
   const menu = Menu.buildFromTemplate([
