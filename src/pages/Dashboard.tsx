@@ -17,7 +17,7 @@ import {
 import StatCard from '../components/StatCard';
 import type { FetchAllResult } from '../types';
 
-const MODEL_COLORS = ['#D78B5C', '#F4B183', '#A8B89D', '#C4A78F', '#8B7355', '#D9C5A0'];
+const MODEL_COLORS = ['#3D59AB', '#9D7CD8', '#7DCFFF', '#E0AF68', '#9ECE6A', '#FF9E64'];
 
 export default function Dashboard() {
   const [data, setData] = useState<FetchAllResult | null>(null);
@@ -70,8 +70,8 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-warm-800">总览</h1>
-          <p className="text-xs text-warm-600 mt-1">
+          <h1 className="text-xl font-semibold text-dark-text">总览</h1>
+          <p className="text-xs text-dark-muted mt-1">
             {lastUpdated ? `最后更新 ${lastUpdated.toLocaleTimeString('zh-CN')}` : '准备中…'}
           </p>
         </div>
@@ -102,21 +102,21 @@ export default function Dashboard() {
           value={balance ? Number(balance.total_balance).toFixed(2) : '--'}
           unit={balance?.currency ?? ''}
           hint={balance ? `已充值 ${Number(balance.topped_up_balance).toFixed(2)}` : undefined}
-          accent="peach"
+          accent="blue"
         />
         <StatCard
           label="赠送额度"
           value={balance ? Number(balance.granted_balance).toFixed(2) : '--'}
           unit={balance?.currency ?? ''}
           hint="Granted"
-          accent="sage"
+          accent="purple"
         />
         <StatCard
           label={usage?.periodLabel ? '本月请求数' : '今日请求数'}
           value={usage ? usage.today.requests.toLocaleString() : '--'}
           unit="次"
           hint={usage ? `累计 ${usage.totals.requests.toLocaleString()}` : '需要登录平台'}
-          accent="dusty"
+          accent="cyan"
         />
         <StatCard
           label={usage?.periodLabel ? '本月 Token' : '今日 Token'}
@@ -131,7 +131,7 @@ export default function Dashboard() {
               ? `输入 ${usage.today.promptTokens.toLocaleString()} · 输出 ${usage.today.completionTokens.toLocaleString()}`
               : '需要登录平台'
           }
-          accent="terracotta"
+          accent="orange"
         />
       </div>
 
@@ -139,10 +139,10 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="card p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-warm-800">
+            <h2 className="text-sm font-semibold text-dark-text">
               {usage?.periodLabel ? '月度 Token 概览' : '7 日 Token 趋势'}
             </h2>
-            <span className="text-xs text-warm-600">
+            <span className="text-xs text-dark-muted">
               {usage ? `${usage.startStr} → ${usage.endStr}` : '—'}
             </span>
           </div>
@@ -155,49 +155,49 @@ export default function Dashboard() {
               />
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={usage?.series ?? []}>
+              <BarChart data={usage?.series ?? []}>
                 <defs>
-                  <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#D78B5C" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#D78B5C" stopOpacity={0} />
+                  <linearGradient id="tokenGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3D59AB" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#9D7CD8" stopOpacity={1} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ECE3D1" />
-                <XAxis dataKey="date" stroke="#8B7355" fontSize={11} />
-                <YAxis stroke="#8B7355" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#2A2A3E" />
+                <XAxis dataKey="date" stroke="#565F89" fontSize={11} />
+                <YAxis stroke="#565F89" fontSize={11} />
                 <Tooltip
                   contentStyle={{
-                    background: '#FFF',
-                    border: '1px solid #ECE3D1',
+                    background: '#1E1E2E',
+                    border: '1px solid #2A2A3E',
                     borderRadius: 10,
                     fontSize: 12,
+                    color: '#C0CAF5',
                   }}
+                  itemStyle={{ color: '#C0CAF5' }}
                 />
-                <Line
-                  type="monotone"
+                <Bar
                   dataKey="promptTokens"
                   name="输入 tokens"
-                  stroke="#F4B183"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
+                  fill="url(#tokenGrad)"
+                  stackId="a"
+                  radius={[0, 0, 0, 0]}
                 />
-                <Line
-                  type="monotone"
+                <Bar
                   dataKey="completionTokens"
                   name="输出 tokens"
-                  stroke="#D78B5C"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
+                  fill="#7DCFFF"
+                  stackId="a"
+                  radius={[4, 4, 0, 0]}
                 />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-              </LineChart>
+                <Legend wrapperStyle={{ fontSize: 11, color: '#C0CAF5' }} />
+              </BarChart>
             </ResponsiveContainer>
             )}
           </div>
         </div>
 
         <div className="card p-5">
-          <h2 className="text-sm font-semibold text-warm-800 mb-3">模型分布</h2>
+          <h2 className="text-sm font-semibold text-dark-text mb-3">模型分布</h2>
           <div className="h-64">
             {modelPie.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -216,13 +216,15 @@ export default function Dashboard() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      background: '#FFF',
-                      border: '1px solid #ECE3D1',
+                      background: '#1E1E2E',
+                      border: '1px solid #2A2A3E',
                       borderRadius: 10,
                       fontSize: 12,
+                      color: '#C0CAF5',
                     }}
+                    itemStyle={{ color: '#C0CAF5' }}
                   />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  <Legend wrapperStyle={{ fontSize: 11, color: '#C0CAF5' }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
@@ -234,48 +236,52 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="card p-5">
-          <h2 className="text-sm font-semibold text-warm-800 mb-3">请求数趋势</h2>
+          <h2 className="text-sm font-semibold text-dark-text mb-3">请求数趋势</h2>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={usage?.series ?? []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ECE3D1" />
-                <XAxis dataKey="date" stroke="#8B7355" fontSize={11} />
-                <YAxis stroke="#8B7355" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#2A2A3E" />
+                <XAxis dataKey="date" stroke="#565F89" fontSize={11} />
+                <YAxis stroke="#565F89" fontSize={11} />
                 <Tooltip
                   contentStyle={{
-                    background: '#FFF',
-                    border: '1px solid #ECE3D1',
+                    background: '#1E1E2E',
+                    border: '1px solid #2A2A3E',
                     borderRadius: 10,
                     fontSize: 12,
+                    color: '#C0CAF5',
                   }}
+                  itemStyle={{ color: '#C0CAF5' }}
                 />
-                <Bar dataKey="requests" fill="#A8B89D" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="requests" fill="#9D7CD8" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         <div className="card p-5">
-          <h2 className="text-sm font-semibold text-warm-800 mb-3">消耗金额趋势</h2>
+          <h2 className="text-sm font-semibold text-dark-text mb-3">消耗金额趋势</h2>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={usage?.series ?? []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ECE3D1" />
-                <XAxis dataKey="date" stroke="#8B7355" fontSize={11} />
-                <YAxis stroke="#8B7355" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#2A2A3E" />
+                <XAxis dataKey="date" stroke="#565F89" fontSize={11} />
+                <YAxis stroke="#565F89" fontSize={11} />
                 <Tooltip
                   contentStyle={{
-                    background: '#FFF',
-                    border: '1px solid #ECE3D1',
+                    background: '#1E1E2E',
+                    border: '1px solid #2A2A3E',
                     borderRadius: 10,
                     fontSize: 12,
+                    color: '#C0CAF5',
                   }}
+                  itemStyle={{ color: '#C0CAF5' }}
                 />
                 <Line
                   type="monotone"
                   dataKey="cost"
                   name="消耗"
-                  stroke="#C4A78F"
+                  stroke="#FFB800"
                   strokeWidth={2}
                   dot={{ r: 3 }}
                 />
@@ -290,8 +296,8 @@ export default function Dashboard() {
         <div className="card p-6 space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-warm-800">尚未获取到使用量详情</p>
-              <p className="text-xs text-warm-600 mt-1">
+              <p className="text-sm font-medium text-dark-text">尚未获取到使用量详情</p>
+              <p className="text-xs text-dark-muted mt-1">
                 使用量、token、请求次数等数据来自 DeepSeek 平台账户。已登录但仍为空时，可能是平台改了接口。
               </p>
             </div>
@@ -304,13 +310,13 @@ export default function Dashboard() {
           </div>
 
           {usageDebugError?.capturedUrls && usageDebugError.capturedUrls.length > 0 && (
-            <details className="text-xs text-warm-600 pt-2 border-t border-cream-200">
-              <summary className="cursor-pointer hover:text-warm-800 select-none">
+            <details className="text-xs text-dark-muted pt-2 border-t border-dark-border">
+              <summary className="cursor-pointer hover:text-dark-text select-none">
                 已抓取的平台接口（{usageDebugError.capturedUrls.length}）· 点击展开
               </summary>
               <ul className="mt-2 space-y-0.5 font-mono text-[11px] max-h-48 overflow-auto">
                 {usageDebugError.capturedUrls.map((u, i) => (
-                  <li key={i} className="text-warm-700 break-all">· {u}</li>
+                  <li key={i} className="text-dark-muted break-all">· {u}</li>
                 ))}
               </ul>
             </details>
@@ -323,6 +329,6 @@ export default function Dashboard() {
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="h-full flex items-center justify-center text-xs text-warm-600/70">{text}</div>
+    <div className="h-full flex items-center justify-center text-xs text-dark-muted/70">{text}</div>
   );
 }

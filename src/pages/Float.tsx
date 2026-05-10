@@ -9,9 +9,9 @@ function fmt(n: number | undefined | null): string {
   return v.toLocaleString('en-US', { maximumFractionDigits: 0 });
 }
 
-function Sparkline({ values, color = '#D78B5C' }: { values: number[]; color?: string }) {
+function Sparkline({ values, color = '#3D59AB' }: { values: number[]; color?: string }) {
   if (values.length < 2) {
-    return <div className="h-8 flex items-center justify-center text-[9px] text-warm-600/60">无曲线数据</div>;
+    return <div className="h-8 flex items-center justify-center text-[9px] text-dark-muted/60">无曲线数据</div>;
   }
   const max = Math.max(...values, 1);
   const min = Math.min(...values, 0);
@@ -104,9 +104,9 @@ export default function Float() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
               <img src="./logo.svg" alt="logo" className="w-4 h-4 rounded" />
-              <span className="text-[11px] font-semibold text-warm-700">DeepSeek</span>
+              <span className="text-[11px] font-semibold text-dark-text">DeepSeek</span>
               {lastUpdated && (
-                <span className="text-[9px] text-warm-600/70 tabular-nums">
+                <span className="text-[9px] text-dark-muted/70 tabular-nums">
                   {lastUpdated.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
                 </span>
               )}
@@ -116,7 +116,7 @@ export default function Float() {
               style={{ WebkitAppRegion: 'no-drag' } as any}
             >
               <button
-                className="w-5 h-5 rounded text-warm-600 hover:bg-cream-200 text-[10px]"
+                className="w-5 h-5 rounded text-dark-muted hover:bg-dark-border text-[10px]"
                 onClick={load}
                 title="刷新"
                 disabled={loading}
@@ -124,14 +124,14 @@ export default function Float() {
                 <span className={loading ? 'inline-block animate-spin' : ''}>↻</span>
               </button>
               <button
-                className="w-5 h-5 rounded text-warm-600 hover:bg-cream-200 text-[10px]"
+                className="w-5 h-5 rounded text-dark-muted hover:bg-dark-border text-[10px]"
                 onClick={() => window.dsApi.showMain()}
                 title="打开主面板"
               >
                 ⤢
               </button>
               <button
-                className="w-5 h-5 rounded text-warm-600 hover:bg-cream-200 text-xs"
+                className="w-5 h-5 rounded text-dark-muted hover:bg-dark-border text-xs"
                 onClick={() => window.dsApi.hideFloat()}
                 title="关闭"
               >
@@ -142,22 +142,22 @@ export default function Float() {
 
           {/* Balance */}
           <div
-            className="no-drag flex items-end justify-between pb-1.5 border-b border-cream-200"
+            className="no-drag flex items-end justify-between pb-1.5 border-b border-dark-border"
             style={{ WebkitAppRegion: 'no-drag' } as any}
           >
             <div>
-              <div className="text-[10px] text-warm-600 mb-0.5">API 余额</div>
-              <div className={`text-2xl font-semibold tabular-nums leading-none ${balanceLow ? 'text-[#b85a3a]' : 'text-warm-800'}`}>
+              <div className="text-[10px] text-neon-blue mb-0.5">API 余额</div>
+              <div className={`text-2xl font-semibold tabular-nums leading-none ${balanceLow ? 'text-neon-red' : 'text-neon-cyan'}`}>
                 {balance ? Number(balance.total_balance).toFixed(2) : '--'}
-                <span className="text-xs text-warm-600 ml-1 font-normal">
+                <span className="text-xs text-dark-muted ml-1 font-normal">
                   {balance?.currency ?? ''}
                 </span>
               </div>
             </div>
             {balance && (
               <div className="text-right">
-                <div className="text-[9px] text-warm-600">充值 / 赠送</div>
-                <div className="text-[10px] text-warm-700 tabular-nums">
+                <div className="text-[9px] text-dark-muted">充值 / 赠送</div>
+                <div className="text-[10px] text-neon-yellow tabular-nums">
                   {Number(balance.topped_up_balance).toFixed(1)} ·{' '}
                   {Number(balance.granted_balance).toFixed(1)}
                 </div>
@@ -170,36 +170,36 @@ export default function Float() {
             className="no-drag grid grid-cols-2 gap-1.5"
             style={{ WebkitAppRegion: 'no-drag' } as any}
           >
-            <div className="bg-cream-100/70 rounded-md px-2 py-1.5">
-              <div className="text-[9px] text-warm-600 mb-0.5">{periodLabel}请求</div>
-              <div className="text-sm text-warm-800 font-semibold tabular-nums leading-tight">
+            <div className="bg-dark-bg/40 rounded-md px-2 py-1.5">
+              <div className="text-[9px] text-dark-muted mb-0.5">{periodLabel}请求</div>
+              <div className="text-sm text-neon-blue font-semibold tabular-nums leading-tight">
                 {usage ? fmt(usage.today.requests) : '--'}
-                <span className="text-[9px] text-warm-600 font-normal ml-1">次</span>
+                <span className="text-[9px] text-dark-muted font-normal ml-1">次</span>
               </div>
             </div>
-            <div className="bg-cream-100/70 rounded-md px-2 py-1.5">
-              <div className="text-[9px] text-warm-600 mb-0.5">{periodLabel}消耗</div>
-              <div className="text-sm text-warm-800 font-semibold tabular-nums leading-tight">
+            <div className="bg-dark-bg/40 rounded-md px-2 py-1.5">
+              <div className="text-[9px] text-dark-muted mb-0.5">{periodLabel}消耗</div>
+              <div className="text-sm text-neon-orange font-semibold tabular-nums leading-tight">
                 {usage ? usage.today.cost.toFixed(2) : '--'}
-                <span className="text-[9px] text-warm-600 font-normal ml-1">
+                <span className="text-[9px] text-dark-muted font-normal ml-1">
                   {balance?.currency ?? ''}
                 </span>
               </div>
             </div>
-            <div className="bg-cream-100/70 rounded-md px-2 py-1.5 col-span-2">
+            <div className="bg-dark-bg/40 rounded-md px-2 py-1.5 col-span-2">
               <div className="flex items-center justify-between mb-0.5">
-                <span className="text-[9px] text-warm-600">{periodLabel} Token</span>
-                <span className="text-[9px] text-warm-700 tabular-nums">
+                <span className="text-[9px] text-dark-muted">{periodLabel} Token</span>
+                <span className="text-[9px] text-neon-purple tabular-nums">
                   {usage ? fmt(usage.today.totalTokens) : '--'}
                 </span>
               </div>
-              <div className="flex items-center gap-1 text-[9px] text-warm-600">
-                <span>↑</span>
+              <div className="flex items-center gap-1 text-[9px] text-dark-muted">
+                <span className="text-neon-cyan">↑</span>
                 <span className="tabular-nums">
                   {usage ? fmt(usage.today.promptTokens) : '--'}
                 </span>
-                <span className="text-warm-600/50 mx-1">·</span>
-                <span>↓</span>
+                <span className="text-dark-muted/50 mx-1">·</span>
+                <span className="text-neon-cyan">↓</span>
                 <span className="tabular-nums">
                   {usage ? fmt(usage.today.completionTokens) : '--'}
                 </span>
@@ -213,17 +213,17 @@ export default function Float() {
               className="no-drag space-y-1"
               style={{ WebkitAppRegion: 'no-drag' } as any}
             >
-              <div className="text-[9px] text-warm-600">模型分布</div>
-              {topModels.map((m) => (
+              <div className="text-[9px] text-dark-muted">模型分布</div>
+              {topModels.map((m, i) => (
                 <div key={m.name} className="flex items-center gap-1.5 text-[10px]">
-                  <span className="flex-1 truncate text-warm-700">{m.name}</span>
-                  <div className="w-14 h-1.5 bg-cream-200 rounded-full overflow-hidden">
+                  <span className="flex-1 truncate text-dark-text">{m.name}</span>
+                  <div className="w-14 h-1.5 bg-dark-bg rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-accent-peach to-accent-terracotta"
+                      className={`h-full ${i === 0 ? 'bg-neon-blue' : i === 1 ? 'bg-neon-purple' : 'bg-neon-cyan'}`}
                       style={{ width: `${m.pct}%` }}
                     />
                   </div>
-                  <span className="tabular-nums text-warm-600 w-8 text-right">{m.pct}%</span>
+                  <span className="tabular-nums text-dark-muted w-8 text-right">{m.pct}%</span>
                 </div>
               ))}
             </div>
@@ -235,17 +235,17 @@ export default function Float() {
               className="no-drag mt-auto"
               style={{ WebkitAppRegion: 'no-drag' } as any}
             >
-              <div className="flex items-center justify-between text-[9px] text-warm-600 mb-0.5">
+              <div className="flex items-center justify-between text-[9px] text-dark-muted mb-0.5">
                 <span>Token 曲线</span>
                 <span>{usage?.series.length ?? 0} 日</span>
               </div>
-              <Sparkline values={sparkValues} />
+              <Sparkline values={sparkValues} color="#3D59AB" />
             </div>
           )}
 
           {/* Error state */}
           {!usage && data?.errors && data.errors.length > 0 && (
-            <div className="mt-auto text-[9px] text-warm-600/80 bg-cream-100/60 rounded px-2 py-1.5">
+            <div className="mt-auto text-[9px] text-neon-red bg-neon-red/10 border border-neon-red/20 rounded px-2 py-1.5">
               {data.errors.find((e) => e.kind === 'usage')?.error ?? '数据未就绪'}
             </div>
           )}

@@ -23,7 +23,7 @@ export default function App() {
   }
 
   return (
-    <div className="h-full w-full flex flex-col bg-cream-50 text-warm-800">
+    <div className="h-full w-full flex flex-col bg-dark-bg text-dark-text">
       <TitleBar
         active={route}
         onNavigate={(r) => {
