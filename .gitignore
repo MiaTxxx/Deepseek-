@@ -37,3 +37,9 @@ Thumbs.db
 
 # electron-builder cache
 .cache/
+
+# skills tooling (not tracked)
+.agents/
+.kiro/
+.reasonix/
+skills-lock.json
