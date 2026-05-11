@@ -41,7 +41,7 @@ function httpRequest(opts: {
     });
     req.on('error', (err) => reject(err));
 
-    if (opts.body) {
+    if (opts.body !== undefined) {
       req.write(typeof opts.body === 'string' ? opts.body : JSON.stringify(opts.body));
     }
     req.end();

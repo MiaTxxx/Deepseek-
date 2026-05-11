@@ -8,7 +8,7 @@ contextBridge.exposeInMainWorld('dsApi', {
   showMain: () => ipcRenderer.invoke('main:show'),
   showFloat: () => ipcRenderer.invoke('float:show'),
   hideFloat: () => ipcRenderer.invoke('float:hide'),
-  toggleFloat: () => ipcRenderer.invoke('float:toggle'),
+  toggleFloat: (): Promise<boolean> => ipcRenderer.invoke('float:toggle'),
 
   // Auth
   loginDeepSeek: () => ipcRenderer.invoke('auth:loginDeepSeek'),

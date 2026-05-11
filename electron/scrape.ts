@@ -131,8 +131,8 @@ export async function scrapePlatformUsage(opts: {
             /* body not available */
           }
         }
-      } catch {
-        /* swallow per-event errors */
+      } catch (err) {
+        console.error('[scrape] debugger event error:', err);
       }
     });
 

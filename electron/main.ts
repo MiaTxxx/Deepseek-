@@ -71,13 +71,24 @@ function createFloatWindow() {
   const winWidth = 300;
   const winHeight = 360;
 
+  // Validate saved position against current displays to avoid restoring
+  // on a disconnected monitor (off-screen).
   const saved = store.get('floatBounds') as { x: number; y: number } | undefined;
+  const isValidPos = saved && screen.getAllDisplays().some((d) => {
+    const b = d.bounds;
+    return (
+      saved.x >= b.x &&
+      saved.x + winWidth <= b.x + b.width &&
+      saved.y >= b.y &&
+      saved.y + winHeight <= b.y + b.height
+    );
+  });
 
   floatWindow = new BrowserWindow({
     width: winWidth,
     height: winHeight,
-    x: saved?.x ?? width - winWidth - 24,
-    y: saved?.y ?? 24,
+    x: isValidPos ? saved!.x : width - winWidth - 24,
+    y: isValidPos ? saved!.y : 24,
     frame: false,
     transparent: true,
     resizable: false,
@@ -161,8 +172,17 @@ ipcMain.handle('win:hide', (e) => BrowserWindow.fromWebContents(e.sender)?.hide(
 ipcMain.handle('float:show', () => createFloatWindow());
 ipcMain.handle('float:hide', () => floatWindow?.hide());
 ipcMain.handle('float:toggle', () => {
-  if (!floatWindow || floatWindow.isDestroyed()) createFloatWindow();
-  else floatWindow.isVisible() ? floatWindow.hide() : floatWindow.show();
+  if (!floatWindow || floatWindow.isDestroyed()) {
+    createFloatWindow();
+    return true;
+  }
+  if (floatWindow.isVisible()) {
+    floatWindow.hide();
+    return false;
+  } else {
+    floatWindow.show();
+    return true;
+  }
 });
 
 ipcMain.handle('main:show', () => {
@@ -250,7 +270,11 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  // keep app alive in tray; do not quit on macOS either
+  // Only quit when user explicitly chose 退出 from tray menu
+  if ((app as any).isQuitting) {
+    app.quit();
+  }
+  // Otherwise keep app alive in tray
 });
 
 app.on('before-quit', () => {

@@ -25,9 +25,9 @@ export default function TitleBar({ active, onNavigate }: Props) {
           className="btn btn-ghost !py-1.5 !px-3"
           onClick={async () => {
             try {
-              await window.dsApi.toggleFloat();
+              const visible = await window.dsApi.toggleFloat();
+              setFloatOn(visible);
             } catch { /* ignore */ }
-            setFloatOn((v) => !v);
           }}
           title="显示/隐藏悬浮窗"
         >
