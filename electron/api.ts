@@ -308,141 +308,6 @@ function normalizeDsNative(amountJson: any, costJson: any | null): NormalizedUsa
 }
 
 // ---------------------------------------------------------------------------
-// Generic heuristic fallback (for non-DeepSeek shapes)
-// ---------------------------------------------------------------------------
-
-const USAGE_KEY_HINTS = [
-  'prompt_tokens',
-  'completion_tokens',
-  'total_tokens',
-  'input_tokens',
-  'output_tokens',
-  'tokens',
-  'requests',
-  'request_count',
-  'call_count',
-  'date',
-  'day',
-  'ds',
-  'report_date',
-];
-
-function looksLikeUsageRow(obj: any): boolean {
-  if (!obj || typeof obj !== 'object') return false;
-  const keys = Object.keys(obj);
-  const hits = keys.filter((k) => USAGE_KEY_HINTS.includes(k)).length;
-  return hits >= 2;
-}
-
-function findUsageArrays(node: any, out: any[][] = [], depth = 0): any[][] {
-  if (depth > 8) return out;
-  if (Array.isArray(node)) {
-    if (node.length > 0 && node.filter(looksLikeUsageRow).length >= Math.min(2, node.length)) {
-      out.push(node);
-    }
-    for (const item of node) findUsageArrays(item, out, depth + 1);
-  } else if (node && typeof node === 'object') {
-    for (const v of Object.values(node)) findUsageArrays(v, out, depth + 1);
-  }
-  return out;
-}
-
-function pickNumber(row: any, ...keys: string[]): number {
-  for (const k of keys) {
-    const v = row?.[k];
-    if (typeof v === 'number') return v;
-    if (typeof v === 'string' && v !== '' && !isNaN(Number(v))) return Number(v);
-  }
-  return 0;
-}
-
-function pickDate(row: any): string {
-  const candidates = [row?.date, row?.day, row?.ds, row?.report_date, row?.timestamp].filter(
-    (v) => v !== undefined && v !== null && v !== '',
-  );
-  let v = candidates[0];
-  if (typeof v === 'number') {
-    const ms = v > 1e12 ? v : v * 1000;
-    v = new Date(ms).toISOString();
-  }
-  return String(v ?? '').slice(0, 10);
-}
-
-function normalizeGenericArray(rows: any[]): NormalizedUsage {
-  const byDate = new Map<string, NormalizedPoint>();
-  const byModel: Record<string, number> = {};
-
-  for (const row of rows) {
-    const date = pickDate(row) || 'unknown';
-    const promptTokens = pickNumber(row, 'prompt_tokens', 'input_tokens');
-    const completionTokens = pickNumber(row, 'completion_tokens', 'output_tokens');
-    const totalTokens =
-      pickNumber(row, 'total_tokens', 'tokens') || promptTokens + completionTokens;
-    const requests = pickNumber(row, 'requests', 'request_count', 'call_count', 'count');
-    const cost = pickNumber(row, 'cost', 'amount', 'fee');
-    const model = String(row?.model ?? 'unknown');
-
-    byModel[model] = (byModel[model] ?? 0) + totalTokens;
-    const existing = byDate.get(date);
-    if (existing) {
-      existing.requests += requests;
-      existing.promptTokens += promptTokens;
-      existing.completionTokens += completionTokens;
-      existing.totalTokens += totalTokens;
-      existing.cost += cost;
-    } else {
-      byDate.set(date, { date, requests, promptTokens, completionTokens, totalTokens, cost });
-    }
-  }
-
-  const series = Array.from(byDate.values())
-    .filter((p) => p.date !== 'unknown')
-    .sort((a, b) => a.date.localeCompare(b.date));
-  const totals = series.reduce(
-    (acc, p) => {
-      acc.requests += p.requests;
-      acc.promptTokens += p.promptTokens;
-      acc.completionTokens += p.completionTokens;
-      acc.totalTokens += p.totalTokens;
-      acc.cost += p.cost;
-      return acc;
-    },
-    { requests: 0, promptTokens: 0, completionTokens: 0, totalTokens: 0, cost: 0 },
-  );
-  const today = new Date().toISOString().slice(0, 10);
-  const todayPoint =
-    series.find((p) => p.date === today) ?? {
-      date: today,
-      requests: 0,
-      promptTokens: 0,
-      completionTokens: 0,
-      totalTokens: 0,
-      cost: 0,
-    };
-  return {
-    startStr: series[0]?.date ?? today,
-    endStr: series[series.length - 1]?.date ?? today,
-    totals,
-    today: todayPoint,
-    series,
-    byModel,
-    currency: findCurrency(rows),
-  };
-}
-
-/** Try DS-native first, then generic heuristic. */
-function normalizeAny(jsonA: any, jsonB: any | null = null): NormalizedUsage | null {
-  const ds = normalizeDsNative(jsonA, jsonB);
-  if (ds) return ds;
-  const arrays = findUsageArrays(jsonA);
-  if (arrays.length > 0) {
-    const best = arrays.sort((a, b) => b.length - a.length)[0];
-    return normalizeGenericArray(best);
-  }
-  return null;
-}
-
-// ---------------------------------------------------------------------------
 // URL manipulation for DS /usage/{amount,cost}
 // ---------------------------------------------------------------------------
 
@@ -504,13 +369,9 @@ async function fetchDsUsageViaStoredEndpoint(
 // ---------------------------------------------------------------------------
 
 function scoreUsageResponse(json: any): number {
-  // Higher score = more likely the usage endpoint
+  // Higher score = more likely the DeepSeek native usage endpoint.
   const ds = extractDsEntries(json);
   if (ds.length > 0) return 1000 + ds.length;
-  const arrays = findUsageArrays(json);
-  if (arrays.length > 0) {
-    return arrays.reduce((n, a) => n + a.length, 0);
-  }
   return 0;
 }
 
@@ -527,32 +388,29 @@ function summarizeCaptured(captured: CapturedResponse[]) {
 
 function autoBestFromCaptured(captured: CapturedResponse[]) {
   const scored = captured
+    .filter((c) => isDsUsageUrl(c.url))
     .map((c) => ({ c, score: scoreUsageResponse(c.json) }))
     .filter((x) => x.score > 0)
     .sort((a, b) => b.score - a.score);
   if (scored.length === 0) return null;
   const best = scored[0].c;
-  // If it's DS-native, try to find its sibling
-  if (isDsUsageUrl(best.url)) {
-    const sibling =
-      best.url.includes('/amount')
-        ? captured.find((c) => c.url === rebuildDsUsageUrl(best.url, { variant: 'cost' }))
-        : captured.find((c) => c.url === rebuildDsUsageUrl(best.url, { variant: 'amount' }));
-    const amtJson = best.url.includes('/amount') ? best.json : sibling?.json;
-    const costJson = best.url.includes('/cost') ? best.json : sibling?.json;
-    if (amtJson) {
-      const normalized = normalizeDsNative(amtJson, costJson ?? null);
-      if (normalized) {
-        const amountUrl = best.url.includes('/amount')
-          ? best.url
-          : rebuildDsUsageUrl(best.url, { variant: 'amount' });
-        return { url: amountUrl, data: normalized, rows: scored[0].score };
-      }
+
+  const sibling =
+    best.url.includes('/amount')
+      ? captured.find((c) => c.url === rebuildDsUsageUrl(best.url, { variant: 'cost' }))
+      : captured.find((c) => c.url === rebuildDsUsageUrl(best.url, { variant: 'amount' }));
+  const amtJson = best.url.includes('/amount') ? best.json : sibling?.json;
+  const costJson = best.url.includes('/cost') ? best.json : sibling?.json;
+  if (amtJson) {
+    const normalized = normalizeDsNative(amtJson, costJson ?? null);
+    if (normalized) {
+      const amountUrl = best.url.includes('/amount')
+        ? best.url
+        : rebuildDsUsageUrl(best.url, { variant: 'amount' });
+      return { url: amountUrl, data: normalized, rows: scored[0].score };
     }
   }
-  const normalized = normalizeAny(best.json);
-  if (!normalized) return null;
-  return { url: best.url, data: normalized, rows: scored[0].score };
+  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -661,20 +519,11 @@ export function registerApiHandlers() {
       }
     }
 
-    // Generic fallback
-    const data = normalizeAny(item.json);
-    if (!data) {
-      return {
-        ok: false,
-        error: '该响应中没有识别到用量数据（检查预览）',
-        url: item.url,
-      };
-    }
-    store.set('usageEndpoint', item.url);
-    if (item.requestHeaders) {
-      store.set('usageHeaders', item.requestHeaders);
-    }
-    return { ok: true, url: item.url, data };
+    return {
+      ok: false,
+      error: '该响应不是 DeepSeek 用量接口（/api/v0/usage/amount 或 /cost），为避免展示误判数据，未绑定。',
+      url: item.url,
+    };
   });
 
   ipcMain.handle('api:usage', async () => {
@@ -688,16 +537,10 @@ export function registerApiHandlers() {
       return { ok: false, error: `已绑定接口调用失败：${r.error}` };
     }
     if (endpoint) {
-      try {
-        const r = await fetchJsonWithCookie(endpoint, cookie);
-        if (r.status === 200 && r.json) {
-          const data = normalizeAny(r.json);
-          if (data) return { ok: true, data, via: 'saved-endpoint' };
-        }
-        return { ok: false, error: `已绑定接口解析失败 HTTP ${r.status}` };
-      } catch (err: any) {
-        return { ok: false, error: err?.message ?? String(err) };
-      }
+      return {
+        ok: false,
+        error: '已绑定接口不是 DeepSeek 原生用量接口，请重新运行「用量接口诊断」。',
+      };
     }
 
     return {
@@ -729,18 +572,10 @@ export function registerApiHandlers() {
         if (r.ok) result.usage = r.data;
         else result.errors.push({ kind: 'usage', error: r.error });
       } else if (endpoint) {
-        try {
-          const r = await fetchJsonWithCookie(endpoint, cookie);
-          if (r.status === 200 && r.json) {
-            const data = normalizeAny(r.json);
-            if (data) result.usage = data;
-            else result.errors.push({ kind: 'usage', error: '已绑定接口解析失败' });
-          } else {
-            result.errors.push({ kind: 'usage', error: `HTTP ${r.status}` });
-          }
-        } catch (err: any) {
-          result.errors.push({ kind: 'usage', error: err?.message ?? String(err) });
-        }
+        result.errors.push({
+          kind: 'usage',
+          error: '已绑定接口不是 DeepSeek 原生用量接口，请重新运行「用量接口诊断」。',
+        });
       } else {
         result.errors.push({
           kind: 'usage',
