@@ -85,6 +85,7 @@ export default function Float() {
 
   const balance = data?.balance?.balance_infos?.[0];
   const usage = data?.usage;
+  const displayCurrency = usage?.currency ?? balance?.currency ?? '';
 
   const isMonthly = !!usage?.periodLabel;
   const periodLabel = isMonthly ? '本月' : '今日';
@@ -174,7 +175,7 @@ export default function Float() {
               <div className={`text-2xl font-semibold tabular-nums leading-none ${balanceLow ? 'text-[#b85a3a]' : 'text-warm-800'}`}>
                 {balance ? Number(balance.total_balance).toFixed(2) : '--'}
                 <span className="text-xs text-warm-600 ml-1 font-normal">
-                  {balance?.currency ?? ''}
+                  {displayCurrency}
                 </span>
               </div>
             </div>
@@ -220,7 +221,7 @@ export default function Float() {
               <div className="text-sm text-warm-800 font-semibold tabular-nums leading-tight">
                 {usage ? usage.today.cost.toFixed(2) : '--'}
                 <span className="text-[9px] text-warm-600 font-normal ml-1">
-                  {balance?.currency ?? ''}
+                  {displayCurrency}
                 </span>
               </div>
             </div>

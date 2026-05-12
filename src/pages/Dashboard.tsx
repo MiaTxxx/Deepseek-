@@ -110,6 +110,7 @@ export default function Dashboard() {
 
   const balance = data?.balance?.balance_infos?.[0];
   const usage = data?.usage;
+  const displayCurrency = usage?.currency ?? balance?.currency ?? '';
   const dailySeries = usage?.series ?? [];
   const hasDailySeries = dailySeries.length > 0;
   const hasUsageBinding = Boolean(config.usageEndpoint);
@@ -251,7 +252,7 @@ export default function Dashboard() {
         </div>
 
         <div className="flex gap-2 flex-wrap text-xs">
-          {balance?.currency && <span className="badge badge-ok">余额 · {balance.currency}</span>}
+          {displayCurrency && <span className="badge badge-ok">结算 · {displayCurrency}</span>}
           {data?.balance?.is_available && <span className="badge badge-ok">服务可用</span>}
           {balanceError && <span className="badge badge-err">余额接口: {balanceError.error}</span>}
           {usageError && <span className="badge badge-warn">使用量: {usageError.error}</span>}
@@ -262,14 +263,14 @@ export default function Dashboard() {
         <StatCard
           label="API 总余额"
           value={balance ? Number(balance.total_balance).toFixed(2) : '--'}
-          unit={balance?.currency ?? ''}
+          unit={displayCurrency}
           hint={balance ? `已充值 ${Number(balance.topped_up_balance).toFixed(2)}` : undefined}
           accent={balanceLow ? 'terracotta' : 'peach'}
         />
         <StatCard
           label="赠送额度"
           value={balance ? Number(balance.granted_balance).toFixed(2) : '--'}
-          unit={balance?.currency ?? ''}
+          unit={displayCurrency}
           hint={balanceLow ? '余额偏低时建议优先补充充值额度' : 'Granted'}
           accent="sage"
         />
@@ -418,7 +419,7 @@ export default function Dashboard() {
         <div className="card p-5">
           <div className="flex items-center justify-between gap-3 mb-3">
             <h2 className="text-sm font-semibold text-warm-800">消耗金额趋势</h2>
-            <span className="text-xs text-warm-600">{balance?.currency ?? ''}</span>
+            <span className="text-xs text-warm-600">{displayCurrency}</span>
           </div>
           <div className="h-56">
             {hasDailySeries ? (

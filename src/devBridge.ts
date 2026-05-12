@@ -48,7 +48,7 @@ if (isDev && !window.dsApi) {
     is_available: true,
     balance_infos: [
       {
-        currency: 'CNY',
+        currency: 'USD',
         total_balance: '42.80',
         granted_balance: '12.80',
         topped_up_balance: '30.00',
@@ -63,10 +63,10 @@ if (isDev && !window.dsApi) {
     today: series[series.length - 1],
     series,
     byModel: {
-      'deepseek-chat': 382_000,
-      'deepseek-reasoner': 188_000,
-      'deepseek-coder': 74_000,
+      'deepseek-v4-pro': 382_000,
+      'deepseek-v4-flash': 188_000,
     },
+    currency: balance.balance_infos[0].currency,
   };
 
   const fetchAll = async (): Promise<FetchAllResult> => {

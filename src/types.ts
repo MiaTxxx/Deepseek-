@@ -27,6 +27,7 @@ export interface UsageData {
   series: UsagePoint[];
   byModel: Record<string, number>;
   periodLabel?: string;
+  currency?: string;
 }
 
 export interface FetchAllResult {

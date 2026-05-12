@@ -156,6 +156,34 @@ interface NormalizedUsage {
   series: NormalizedPoint[];
   byModel: Record<string, number>;
   periodLabel?: string; // e.g. "2026-05 月累计" when no daily breakdown
+  currency?: string;
+}
+
+function findCurrency(node: any, depth = 0): string | undefined {
+  if (depth > 8 || node === null || node === undefined) return undefined;
+  if (typeof node === 'string') {
+    const value = node.trim().toUpperCase();
+    return /^(USD|CNY|RMB|EUR|JPY|GBP|HKD|SGD)$/.test(value) ? value : undefined;
+  }
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const found = findCurrency(item, depth + 1);
+      if (found) return found;
+    }
+    return undefined;
+  }
+  if (typeof node !== 'object') return undefined;
+
+  for (const key of ['currency', 'settlement_currency', 'settlementCurrency', 'unit']) {
+    const found = findCurrency(node[key], depth + 1);
+    if (found) return found === 'RMB' ? 'CNY' : found;
+  }
+
+  for (const value of Object.values(node)) {
+    const found = findCurrency(value, depth + 1);
+    if (found) return found === 'RMB' ? 'CNY' : found;
+  }
+  return undefined;
 }
 
 function normalizeDsNative(amountJson: any, costJson: any | null): NormalizedUsage | null {
@@ -275,6 +303,7 @@ function normalizeDsNative(amountJson: any, costJson: any | null): NormalizedUsa
     series,
     byModel,
     periodLabel: hasDaily ? undefined : periodLabel,
+    currency: findCurrency(costJson) ?? findCurrency(amountJson),
   };
 }
 
@@ -397,6 +426,7 @@ function normalizeGenericArray(rows: any[]): NormalizedUsage {
     today: todayPoint,
     series,
     byModel,
+    currency: findCurrency(rows),
   };
 }
 
