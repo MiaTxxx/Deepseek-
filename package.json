@@ -1,6 +1,6 @@
 {
   "name": "deepseek-monitor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "DeepSeek API quota & usage monitor with floating window",
   "author": "MiaTxxx",
   "license": "MIT",
