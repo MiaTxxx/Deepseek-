@@ -10,6 +10,7 @@
     "build": "tsc -b && vite build && electron-builder",
     "electron:dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && tsc -p electron/tsconfig.json && cross-env NODE_ENV=development electron .\"",
     "electron:build": "vite build && tsc -p electron/tsconfig.json && electron-builder",
+    "electron:build:exe": "tsc -b && vite build && tsc -p electron/tsconfig.json && electron-builder --win nsis --x64",
     "electron:build:msi": "tsc -b && vite build && tsc -p electron/tsconfig.json && electron-builder --win msi --x64"
   },
   "dependencies": {
@@ -52,7 +53,7 @@
     "win": {
       "target": [
         {
-          "target": "msi",
+          "target": "nsis",
           "arch": [
             "x64"
           ]
