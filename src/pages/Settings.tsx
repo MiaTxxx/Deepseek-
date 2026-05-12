@@ -15,6 +15,7 @@ export default function Settings() {
   const [refreshIntervalSec, setRefreshIntervalSec] = useState(60);
   const [usageEndpoint, setUsageEndpoint] = useState('');
   const [loggingIn, setLoggingIn] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
   const [showKey, setShowKey] = useState(false);
 
@@ -37,13 +38,28 @@ export default function Settings() {
   }, []);
 
   const save = async () => {
-    const r = await window.dsApi.setConfig({ apiKey, refreshIntervalSec });
-    if (r.ok) {
-      setMsg({ type: 'ok', text: '已保存' });
-    } else {
-      setMsg({ type: 'err', text: '保存失败' });
+    setSaving(true);
+    try {
+      const r = await window.dsApi.setConfig({ apiKey, refreshIntervalSec });
+      if (r.ok) {
+        setMsg({ type: 'ok', text: '已保存' });
+      } else {
+        setMsg({ type: 'err', text: '保存失败' });
+      }
+      setTimeout(() => setMsg(null), 1600);
+    } finally {
+      setSaving(false);
     }
-    setTimeout(() => setMsg(null), 1600);
+  };
+
+  const copyUsageEndpoint = async () => {
+    if (!usageEndpoint) return;
+    try {
+      await navigator.clipboard.writeText(usageEndpoint);
+      setMsg({ type: 'ok', text: '已复制用量接口地址' });
+    } catch {
+      setMsg({ type: 'err', text: '复制失败' });
+    }
   };
 
   const testBalance = async () => {
@@ -215,8 +231,21 @@ export default function Settings() {
         </header>
 
         {usageEndpoint && (
-          <div className="text-[11px] font-mono text-warm-700 bg-cream-100/70 rounded-md p-2 break-all">
-            {usageEndpoint}
+          <div className="space-y-2">
+            <div className="text-[11px] font-mono text-warm-700 bg-cream-100/70 rounded-md p-2 break-all">
+              {usageEndpoint}
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <button className="btn btn-ghost !text-[11px] !py-1 !px-2" onClick={copyUsageEndpoint}>
+                复制接口
+              </button>
+              <button
+                className="btn btn-ghost !text-[11px] !py-1 !px-2"
+                onClick={() => window.dsApi.openExternal('https://platform.deepseek.com/usage')}
+              >
+                打开用量页
+              </button>
+            </div>
           </div>
         )}
 
@@ -300,6 +329,17 @@ export default function Settings() {
           <h2 className="text-sm font-semibold text-warm-800">刷新间隔</h2>
           <p className="text-xs text-warm-600 mt-1">主面板与悬浮窗的数据自动刷新周期</p>
         </header>
+        <div className="flex flex-wrap gap-2">
+          {[15, 30, 60, 300].map((sec) => (
+            <button
+              key={sec}
+              className={`btn !py-1.5 !px-3 ${refreshIntervalSec === sec ? 'btn-primary' : 'btn-ghost'}`}
+              onClick={() => setRefreshIntervalSec(sec)}
+            >
+              {sec < 60 ? `${sec}s` : sec === 300 ? '5m' : '1m'}
+            </button>
+          ))}
+        </div>
         <div className="flex items-center gap-3">
           <input
             className="input max-w-[160px]"
@@ -316,8 +356,8 @@ export default function Settings() {
             }}
           />
           <span className="text-xs text-warm-600">秒</span>
-          <button className="btn btn-primary ml-auto" onClick={save}>
-            保存
+          <button className="btn btn-primary ml-auto" onClick={save} disabled={saving}>
+            {saving ? '保存中…' : '保存'}
           </button>
         </div>
       </section>

@@ -73,6 +73,12 @@ body {
   user-select: none;
   cursor: pointer;
 }
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
 
 .btn-primary {
   background: linear-gradient(135deg, #f4b183 0%, #d78b5c 100%);
@@ -124,6 +130,10 @@ body {
 .badge-warn {
   background: rgba(244, 177, 131, 0.25);
   color: #8a5a33;
+}
+.badge-info {
+  background: rgba(112, 141, 166, 0.14);
+  color: #486276;
 }
 .badge-err {
   background: rgba(215, 100, 100, 0.2);

@@ -48,6 +48,8 @@ export default function Float() {
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [intervalSec, setIntervalSec] = useState(60);
+  const [usageEndpoint, setUsageEndpoint] = useState('');
+  const [hasCookie, setHasCookie] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('float-body');
@@ -58,6 +60,8 @@ export default function Float() {
     (async () => {
       const cfg = await window.dsApi.getConfig();
       setIntervalSec(cfg.refreshIntervalSec ?? 60);
+      setUsageEndpoint(cfg.usageEndpoint ?? '');
+      setHasCookie(cfg.hasCookie);
     })();
   }, []);
 
@@ -84,6 +88,7 @@ export default function Float() {
 
   const isMonthly = !!usage?.periodLabel;
   const periodLabel = isMonthly ? '本月' : '今日';
+  const hasUsageBinding = Boolean(usageEndpoint);
 
   const topModels = useMemo(() => {
     if (!usage) return [] as Array<{ name: string; value: number; pct: number }>;
@@ -149,6 +154,16 @@ export default function Float() {
             </div>
           </div>
 
+          <div className="flex items-center gap-1 flex-wrap text-[9px]">
+            <span className={`badge !text-[9px] !px-1.5 !py-0 ${hasCookie ? 'badge-ok' : 'badge-warn'}`}>
+              平台 {hasCookie ? '已登录' : '未登录'}
+            </span>
+            <span className={`badge !text-[9px] !px-1.5 !py-0 ${hasUsageBinding ? 'badge-ok' : 'badge-info'}`}>
+              接口 {hasUsageBinding ? '已绑定' : '待绑定'}
+            </span>
+            <span className="badge badge-info !text-[9px] !px-1.5 !py-0">每 {intervalSec}s 刷新</span>
+          </div>
+
           {/* Balance */}
           <div
             className="no-drag flex items-end justify-between pb-1.5 border-b border-cream-200"
@@ -173,6 +188,20 @@ export default function Float() {
               </div>
             )}
           </div>
+
+          {!usage && (
+            <div className="rounded-md bg-[#eef5fb] px-2 py-1.5 text-[9px] leading-snug text-[#486276]">
+              {hasUsageBinding
+                ? '接口已绑定，但还没有拿到可视化数据。'
+                : '先在主面板完成用量接口绑定，悬浮窗才能显示趋势。'}
+            </div>
+          )}
+
+          {balanceLow && (
+            <div className="rounded-md bg-[#fbf0e9] px-2 py-1.5 text-[9px] leading-snug text-[#9a5b3d]">
+              余额偏低，建议尽快补充。
+            </div>
+          )}
 
           {/* Today/Month metrics */}
           <div

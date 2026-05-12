@@ -46,7 +46,7 @@ declare global {
       showMain: () => Promise<void>;
       showFloat: () => Promise<void>;
       hideFloat: () => Promise<void>;
-      toggleFloat: () => Promise<void>;
+      toggleFloat: () => Promise<boolean>;
       loginDeepSeek: () => Promise<{ ok: boolean; cookie?: string; error?: string }>;
       getConfig: () => Promise<{ apiKey: string; hasCookie: boolean; refreshIntervalSec: number; usageEndpoint: string }>;
       setConfig: (cfg: Partial<{ apiKey: string; refreshIntervalSec: number; usageEndpoint: string }>) => Promise<{ ok: boolean }>;
