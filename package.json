@@ -1,6 +1,6 @@
 {
   "name": "deepseek-monitor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "DeepSeek API quota & usage monitor with floating window",
   "author": "MiaTxxx",
   "license": "MIT",
@@ -9,7 +9,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build && electron-builder",
     "electron:dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && tsc -p electron/tsconfig.json && cross-env NODE_ENV=development electron .\"",
-    "electron:build": "vite build && tsc -p electron/tsconfig.json && electron-builder"
+    "electron:build": "vite build && tsc -p electron/tsconfig.json && electron-builder",
+    "electron:build:msi": "tsc -b && vite build && tsc -p electron/tsconfig.json && electron-builder --win msi --x64"
   },
   "dependencies": {
     "axios": "^1.7.7",
@@ -39,8 +40,10 @@
     "productName": "DeepSeek Monitor",
     "copyright": "Copyright © 2026 MiaTxxx",
     "files": [
+      "package.json",
       "dist/**/*",
-      "dist-electron/**/*"
+      "dist-electron/**/*",
+      "node_modules/**/*"
     ],
     "directories": {
       "output": "release",
@@ -49,8 +52,10 @@
     "win": {
       "target": [
         {
-          "target": "nsis",
-          "arch": ["x64"]
+          "target": "msi",
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
@@ -68,7 +73,9 @@
       "category": "public.app-category.developer-tools"
     },
     "linux": {
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "category": "Development"
     }
   }
